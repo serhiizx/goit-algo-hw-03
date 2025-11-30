@@ -2,6 +2,7 @@ import sys
 import os
 from pathlib import Path
 import shutil
+import argparse
 
 def has_write_permission(path) -> bool:
     return os.access(path, os.W_OK)
@@ -32,21 +33,20 @@ def copy(source: Path, dest: Path) -> None:
             dest_item = dest / item.name
             copy(item, dest_item)
 
-def main():
-    if len(sys.argv) != 2:
-        print(
-            "Usage: tast1.py <source> [dest_dir]\n"
-            "Default: dest_dir=dist"
-            )
-        sys.exit(1)
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("src", type=str, help="Source dir to copy")
+    parser.add_argument("-d", "--dest", type=str, default="dist", help="Destination dir")
+    
+    return parser.parse_args()
 
-    source_arg = sys.argv[1] if len(sys.argv) > 1 else None
-    dist_arg = sys.argv[2] if len(sys.argv) > 2 else 'dist'
-    source = Path(source_arg)
-    dist = Path(dist_arg)
+def main():
+    args = parse_args()
+    source = Path(args.src)
+    dist = Path(args.dest)
     
     if not source.exists():
-        print(f"Error: '{source}' not found")
+        print(f"Error: Directory '{source}' not found")
         sys.exit(1)
     
     if not source.is_dir(): 
